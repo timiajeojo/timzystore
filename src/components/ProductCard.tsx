@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Product } from "@/lib/products";
 import { ArrowUpRightIcon, BadgeCheckIcon } from "./icons";
 
@@ -15,6 +18,32 @@ function ShoeArt({ color }: { color: string }) {
       <rect x="18" y="88" width="166" height="12" rx="6" fill="#fff" stroke="#e7e2d9" />
       <path d="M84 40l10 14M96 36l10 16" stroke="#fff" strokeOpacity=".7" strokeWidth="3" strokeLinecap="round" />
     </svg>
+  );
+}
+
+const PREVIEW_WORDS = 8;
+
+function Description({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const words = text.split(" ");
+  const long = words.length > PREVIEW_WORDS;
+  const shown =
+    open || !long ? text : words.slice(0, PREVIEW_WORDS).join(" ") + "…";
+
+  return (
+    <p className="mt-2 text-sm leading-relaxed text-muted">
+      {shown}
+      {long && (
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          className="ml-1.5 font-medium text-accent hover:underline"
+        >
+          {open ? "View less" : "Read more"}
+        </button>
+      )}
+    </p>
   );
 }
 
@@ -46,6 +75,10 @@ export default function ProductCard({ product }: { product: Product }) {
         <h3 className="text-lg font-medium">{product.name}</h3>
         <span className="text-lg">{naira(product.price)}</span>
       </div>
+      <p className="mt-1 text-right text-sm text-muted">
+        Sizes: {product.sizes.join(", ")}
+      </p>
+      <Description text={product.description} />
     </article>
   );
 }
