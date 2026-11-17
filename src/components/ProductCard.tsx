@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { naira } from "@/lib/format";
 import type { Product } from "@/lib/products";
-import { ArrowUpRightIcon, BadgeCheckIcon } from "./icons";
-
-const naira = (n: number) =>
-  "₦" + new Intl.NumberFormat("en-NG").format(n);
+import { BadgeCheckIcon, CartIcon, CheckIcon } from "./icons";
 
 // Simple shoe silhouette used until real product photos are added.
 function ShoeArt({ color }: { color: string }) {
@@ -48,6 +47,15 @@ function Description({ text }: { text: string }) {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  function addToCart() {
+    add(product.id);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
+  }
+
   return (
     <article className="relative flex flex-col rounded-3xl bg-white p-5 shadow-sm">
       <div className="flex h-8 items-center justify-between">
@@ -59,9 +67,16 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : (
           <span />
         )}
-        <span className="grid h-11 w-11 place-items-center rounded-full bg-cream text-ink">
-          <ArrowUpRightIcon />
-        </span>
+        <button
+          type="button"
+          onClick={addToCart}
+          aria-label={`Add ${product.name} to cart`}
+          className={`grid h-11 w-11 place-items-center rounded-full transition ${
+            added ? "bg-accent text-white" : "bg-cream text-ink hover:bg-line"
+          }`}
+        >
+          {added ? <CheckIcon /> : <CartIcon />}
+        </button>
       </div>
 
       <div className="mx-auto my-4 aspect-[4/3] w-full max-w-[16rem]">

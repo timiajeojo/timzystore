@@ -79,3 +79,24 @@ export const LogoMark = ({ className }: IconProps) => (
     <path d="M13 29h19" />
   </svg>
 );
+
+export const CartIcon = ({ className }: IconProps) => (
+  <svg {...base} className={className}>
+    <path d="M3 4h2l2.2 10.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2" />
+    <circle cx="9.5" cy="19.5" r="1.3" />
+    <circle cx="17" cy="19.5" r="1.3" />
+  </svg>
+);
+
+export const UserIcon = ({ className }: IconProps) => (
+  <svg {...base} className={className}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4.5 20c.8-3.6 3.7-5.5 7.5-5.5s6.7 1.9 7.5 5.5" />
+  </svg>
+);
+
+export const CheckIcon = ({ className }: IconProps) => (
+  <svg {...base} className={className}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>
+);

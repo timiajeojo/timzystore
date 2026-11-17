@@ -1,4 +1,4 @@
-import SubscribeForm from "./SubscribeForm";
+import SearchBar from "./SearchBar";
 
 export default function Hero() {
   return (
@@ -13,11 +13,11 @@ export default function Hero() {
       </h1>
 
       <p className="mx-auto mt-5 max-w-lg text-lg text-muted">
-        Subscribe for weekly emails featuring carefully picked pairs, straight
-        to your inbox.
+        Browse our carefully picked pairs, or search for exactly what you
+        need.
       </p>
 
-      <SubscribeForm />
+      <SearchBar />
     </section>
   );
 }

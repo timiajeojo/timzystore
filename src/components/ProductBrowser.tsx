@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CATEGORIES, products } from "@/lib/products";
+import { useSearch } from "@/context/SearchContext";
 import ProductCard from "./ProductCard";
 import {
   ChevronDownIcon,
@@ -18,9 +19,18 @@ const chip =
 export default function ProductBrowser() {
   const [category, setCategory] = useState<string>("All");
   const [sort, setSort] = useState<Sort>("featured");
+  const { query } = useSearch();
+  const q = query.trim().toLowerCase();
 
   const visible = products
     .filter((p) => category === "All" || p.category === category)
+    .filter(
+      (p) =>
+        !q ||
+        [p.name, p.brand, p.category, p.description].some((t) =>
+          t.toLowerCase().includes(q)
+        )
+    )
     .sort((a, b) =>
       sort === "low" ? a.price - b.price : sort === "high" ? b.price - a.price : 0
     );
@@ -68,7 +78,7 @@ export default function ProductBrowser() {
       </div>
 
       {visible.length === 0 ? (
-        <p className="mt-10 text-center text-muted">No shoes in this category yet.</p>
+        <p className="mt-10 text-center text-muted">No shoes found.</p>
       ) : (
         <div className="mt-6 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((p) => (
