@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CATEGORIES, products } from "@/lib/products";
 import { useSearch } from "@/context/SearchContext";
 import ProductCard from "./ProductCard";
-import {
-  ChevronDownIcon,
-  ChevronsUpDownIcon,
-  GridIcon,
-  SlidersIcon,
-} from "./icons";
+import { ChevronsUpDownIcon, GridIcon, SlidersIcon } from "./icons";
 
 type Sort = "featured" | "low" | "high";
 
@@ -19,8 +14,27 @@ const chip =
 export default function ProductBrowser() {
   const [category, setCategory] = useState<string>("All");
   const [sort, setSort] = useState<Sort>("featured");
+  const [open, setOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
   const { query } = useSearch();
   const q = query.trim().toLowerCase();
+
+  // Close the category list when tapping outside it or pressing Escape
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      if (!filterRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   const visible = products
     .filter((p) => category === "All" || p.category === category)
@@ -37,32 +51,66 @@ export default function ProductBrowser() {
 
   return (
     <section className="mx-auto mt-12 w-full max-w-6xl px-4 pb-16 sm:px-6">
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
-        {["All", ...CATEGORIES].map((c) => (
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setCategory("All")}
+          className={`${chip} ${
+            category === "All"
+              ? "border-white bg-white font-medium shadow-sm"
+              : "border-line text-muted hover:text-ink"
+          }`}
+        >
+          <GridIcon />
+          All
+        </button>
+
+        <div ref={filterRef} className="relative">
           <button
-            key={c}
             type="button"
-            onClick={() => setCategory(c)}
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-haspopup="listbox"
             className={`${chip} ${
-              category === c
+              category !== "All"
                 ? "border-white bg-white font-medium shadow-sm"
                 : "border-line text-muted hover:text-ink"
             }`}
           >
-            {c === "All" && <GridIcon />}
-            {c}
+            <SlidersIcon />
+            {category === "All" ? "Filter" : category}
           </button>
-        ))}
 
-        {/* Visual placeholders for now */}
-        <button type="button" className={`${chip} border-line text-muted`}>
-          ··· More <ChevronDownIcon />
-        </button>
-        <button type="button" className={`${chip} border-white bg-white shadow-sm`}>
-          <SlidersIcon /> Filter
-        </button>
+          {open && (
+            <ul
+              role="listbox"
+              aria-label="Categories"
+              className="absolute left-0 top-full z-20 mt-2 max-h-72 w-56 overflow-y-auto rounded-2xl border border-line bg-white p-1.5 shadow-lg"
+            >
+              {CATEGORIES.map((c) => (
+                <li key={c}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={category === c}
+                    onClick={() => {
+                      setCategory(c);
+                      setOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-base hover:bg-cream ${
+                      category === c ? "font-medium text-accent" : ""
+                    }`}
+                  >
+                    {c}
+                    {category === c && <span aria-hidden>✓</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-        <label className={`${chip} relative border-white bg-white shadow-sm`}>
+        <label className={`${chip} relative ml-auto border-white bg-white shadow-sm`}>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
