@@ -11,7 +11,7 @@ export default function CartPage() {
 
   const items = lines.flatMap((l) => {
     const product = products.find((p) => p.id === l.id);
-    return product ? [{ product, qty: l.qty }] : [];
+    return product ? [{ product, size: l.size, qty: l.qty }] : [];
   });
   const total = items.reduce((n, i) => n + i.product.price * i.qty, 0);
 
@@ -42,9 +42,9 @@ export default function CartPage() {
         ) : (
           <>
             <ul className="mt-6 space-y-3">
-              {items.map(({ product, qty }) => (
+              {items.map(({ product, size, qty }) => (
                 <li
-                  key={product.id}
+                  key={`${product.id}-${size ?? "x"}`}
                   className="flex items-center gap-4 rounded-3xl bg-white p-4 shadow-sm"
                 >
                   <div
@@ -54,10 +54,13 @@ export default function CartPage() {
                   />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{product.name}</p>
-                    <p className="text-sm text-muted">{naira(product.price)}</p>
+                    <p className="text-sm text-muted">
+                      {naira(product.price)}
+                      {size !== undefined && ` · Size ${size}`}
+                    </p>
                     <button
                       type="button"
-                      onClick={() => remove(product.id)}
+                      onClick={() => remove(product.id, size)}
                       className="mt-1 text-sm text-accent hover:underline"
                     >
                       Remove
@@ -67,7 +70,7 @@ export default function CartPage() {
                     <button
                       type="button"
                       aria-label="Decrease quantity"
-                      onClick={() => setQty(product.id, qty - 1)}
+                      onClick={() => setQty(product.id, size, qty - 1)}
                       className="grid h-9 w-9 place-items-center rounded-full bg-cream text-lg"
                     >
                       −
@@ -76,7 +79,7 @@ export default function CartPage() {
                     <button
                       type="button"
                       aria-label="Increase quantity"
-                      onClick={() => setQty(product.id, qty + 1)}
+                      onClick={() => setQty(product.id, size, qty + 1)}
                       className="grid h-9 w-9 place-items-center rounded-full bg-cream text-lg"
                     >
                       +

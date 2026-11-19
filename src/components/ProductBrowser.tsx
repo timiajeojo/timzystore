@@ -27,7 +27,7 @@ export default function ProductBrowser() {
     .filter(
       (p) =>
         !q ||
-        [p.name, p.brand, p.category, p.description].some((t) =>
+        [p.name, p.category, p.description].some((t) =>
           t.toLowerCase().includes(q)
         )
     )
